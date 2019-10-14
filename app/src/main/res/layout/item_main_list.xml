@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <com.google.android.exoplayer2.ui.PlayerView
+            android:id="@+id/vedioMainItem"
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:visibility="gone"/>
+
+    <ImageView
+            android:id="@+id/imageMainItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"/>
+
+    <TextView
+            android:id="@+id/textMainItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="25dp"
+            android:gravity="center"
+            android:textColor="#000000"
+            android:textSize="12sp"
+            tools:text="Sample sample!!!"/>
+
+</LinearLayout>
