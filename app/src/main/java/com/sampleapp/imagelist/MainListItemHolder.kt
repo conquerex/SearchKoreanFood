@@ -26,7 +26,7 @@ class MainListItemHolder(parent: ViewGroup) :
     val photo = itemView.imageMainItem
     val title = itemView.textMainItem
     val video = itemView.vedioMainItem
-    
+
     private var exoplayer : SimpleExoPlayer? = null
 
     fun bind(itemPhoto: Photo) {
