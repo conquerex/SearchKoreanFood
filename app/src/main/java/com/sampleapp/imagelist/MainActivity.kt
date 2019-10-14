@@ -31,6 +31,14 @@ class MainActivity : AppCompatActivity() {
         getImages(page)
     }
 
+    override fun onPause() {
+        super.onPause()
+        // todo 앱이 백그라운드로 나올 때, 플레이어 중지
+        if (videoOn) {
+//            listAdapter.stopPlayer()
+        }
+    }
+
     fun getImages(page: Int) {
         apiRequest.getImages(page).enqueue(object : Callback<ImagesResponse> {
             override fun onFailure(call: Call<ImagesResponse>, t: Throwable) {
@@ -59,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         listAdapter.addImages(photos.photo)
         photoList.addAll(photos.photo)
 
-        listMain.setPhotos(photoList)
+//        listMain.setPhotos(photoList)
         listMain.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -82,7 +90,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             /**
-             * todo 영상이 화면 바깥으로 나갔으나 바로 영상이 종료되지 않고 2~3초 뒤에 종료됨
+             * todo 영상이 화면 바깥으로 나갔으나 영상은 몇초 후 종료가 됨
              */
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(recyclerView, newState)

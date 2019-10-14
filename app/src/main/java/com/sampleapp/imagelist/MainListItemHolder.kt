@@ -26,11 +26,6 @@ class MainListItemHolder(parent: ViewGroup) :
     val photo = itemView.imageMainItem
     val title = itemView.textMainItem
     val video = itemView.vedioMainItem
-//    val video = itemView.mediaContainer
-
-    var mediaContainer: FrameLayout? = null
-    var volumeControl: ImageView? = null
-    var progressBar: ProgressBar? = null
 
     private var playWhenReady = true
     private var exoplayer : SimpleExoPlayer? = null
@@ -56,9 +51,6 @@ class MainListItemHolder(parent: ViewGroup) :
         }
     }
 
-    /**
-     * todo 두번째부터 나오는 영상에는 자동재생이 되지 않음
-     */
     private fun initializePlayer(itemPhoto: Photo) {
         val sample = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4"
 
@@ -72,7 +64,6 @@ class MainListItemHolder(parent: ViewGroup) :
         //prepare
         exoplayer?.prepare(mediaSource, true, false)
         //start,stop
-//        exoplayer?.setPlayWhenReady(playWhenReady)
         if (!itemPhoto.videoOn) {
 //            exoplayer?.stop(true)
             exoplayer?.setPlayWhenReady(false)
@@ -86,7 +77,6 @@ class MainListItemHolder(parent: ViewGroup) :
         val userAgent = Util.getUserAgent(itemView.context, itemView.context.getString(R.string.app_name))
         return if (uri.lastPathSegment!!.contains("mp3") || uri.lastPathSegment!!.contains("mp4")) {
             ProgressiveMediaSource.Factory(DefaultHttpDataSourceFactory(userAgent)).createMediaSource(uri)
-//            HlsMediaSource.Factory(DefaultHttpDataSourceFactory(userAgent)).createMediaSource(uri)
         } else {
             ProgressiveMediaSource.Factory(DefaultDataSourceFactory(itemView.context, userAgent)).createMediaSource(uri)
         }
