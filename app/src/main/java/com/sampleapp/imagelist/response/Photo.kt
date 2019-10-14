@@ -1,4 +1,4 @@
-package com.meme.hwapp.response
+package com.sampleapp.imagelist.response
 
 import com.google.gson.annotations.SerializedName
 
@@ -13,5 +13,6 @@ data class Photo (
 	@SerializedName("isfriend") val isfriend : Int,
 	@SerializedName("isfamily") val isfamily : Int,
 
-	var isVideo: Boolean = false
+	var isVideo: Boolean = false,
+	var videoOn: Boolean = false
 )

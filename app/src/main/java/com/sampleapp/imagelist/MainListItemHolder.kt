@@ -4,17 +4,19 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.MediaSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
-import com.meme.hwapp.response.Photo
+import com.sampleapp.imagelist.response.Photo
 import kotlinx.android.synthetic.main.item_main_list.view.*
 
 
@@ -24,12 +26,17 @@ class MainListItemHolder(parent: ViewGroup) :
     val photo = itemView.imageMainItem
     val title = itemView.textMainItem
     val video = itemView.vedioMainItem
+//    val video = itemView.mediaContainer
+
+    var mediaContainer: FrameLayout? = null
+    var volumeControl: ImageView? = null
+    var progressBar: ProgressBar? = null
 
     private var playWhenReady = true
     private var exoplayer : SimpleExoPlayer? = null
 
     fun bind(itemPhoto: Photo) {
-        initializePlayer()
+        initializePlayer(itemPhoto)
 
         val imageString = "https://farm${itemPhoto.farm}.staticflickr.com/${itemPhoto.server}/${itemPhoto.id}_${itemPhoto.secret}.jpg"
 
@@ -49,7 +56,10 @@ class MainListItemHolder(parent: ViewGroup) :
         }
     }
 
-    private fun initializePlayer() {
+    /**
+     * todo 두번째부터 나오는 영상에는 자동재생이 되지 않음
+     */
+    private fun initializePlayer(itemPhoto: Photo) {
         val sample = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4"
 
         if (exoplayer == null) {
@@ -62,7 +72,13 @@ class MainListItemHolder(parent: ViewGroup) :
         //prepare
         exoplayer?.prepare(mediaSource, true, false)
         //start,stop
-        exoplayer?.setPlayWhenReady(playWhenReady)
+//        exoplayer?.setPlayWhenReady(playWhenReady)
+        if (!itemPhoto.videoOn) {
+//            exoplayer?.stop(true)
+            exoplayer?.setPlayWhenReady(false)
+        } else {
+            exoplayer?.setPlayWhenReady(true)
+        }
     }
 
     // 네트워크에 있는 미디어 파일을 포맷별 Play가 가능하도록 객체 생성

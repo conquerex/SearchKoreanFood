@@ -1,6 +1,7 @@
 package com.meme.hwapp.response
 
 import com.google.gson.annotations.SerializedName
+import com.sampleapp.imagelist.response.Photo
 
 data class Photos (
 	@SerializedName("page") val page : Int,

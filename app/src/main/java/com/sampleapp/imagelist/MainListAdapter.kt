@@ -3,7 +3,7 @@ package com.sampleapp.imagelist
 import android.util.Log
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.meme.hwapp.response.Photo
+import com.sampleapp.imagelist.response.Photo
 
 class MainListAdapter : RecyclerView.Adapter<MainListItemHolder>() {
 
@@ -21,6 +21,10 @@ class MainListAdapter : RecyclerView.Adapter<MainListItemHolder>() {
         holder.bind(images[position])
     }
 
+    override fun getItemId(position: Int): Long {
+        return images[position].id.toLong()
+    }
+
     fun addImages(imgs: ArrayList<Photo>) {
         for (i in 1..imgs.size) {
             // 동영상 들어갈 Item, 임의로 정의
@@ -31,5 +35,10 @@ class MainListAdapter : RecyclerView.Adapter<MainListItemHolder>() {
             images.add(imgs[i-1])
         }
         notifyItemRangeChanged(images.size - imgs.size, imgs.size)
+    }
+
+    fun refreshImages(imgs: ArrayList<Photo>) {
+        images = imgs
+        notifyDataSetChanged()
     }
 }

@@ -1,46 +1,41 @@
 package com.sampleapp.imagelist
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.MediaSource
-import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import com.meme.hwapp.network.ApiRequest
 import com.meme.hwapp.network.NetworkSetting
 import com.meme.hwapp.response.ImagesResponse
 import com.meme.hwapp.response.Photos
+import com.sampleapp.imagelist.response.Photo
 import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
-
+    private val TAG = "MainActivity"
     var apiRequest = NetworkSetting.getClient().create(ApiRequest::class.java)
     var page = 1
     var loading = true
     var listAdapter = MainListAdapter()
+    var photoList = ArrayList<Photo>()
+    var videoOn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        listAdapter.setHasStableIds(true)
         getImages(page)
     }
 
     fun getImages(page: Int) {
         apiRequest.getImages(page).enqueue(object : Callback<ImagesResponse> {
             override fun onFailure(call: Call<ImagesResponse>, t: Throwable) {
-                Log.d("MainRepository", "* * * onFailure")
-                Log.d("MainRepository", "* * * ${t.message}")
+                Log.d(TAG, "* * * onFailure")
+                Log.d(TAG, "* * * ${t.message}")
             }
 
             override fun onResponse(call: Call<ImagesResponse>, response: Response<ImagesResponse>) {
@@ -62,8 +57,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         listAdapter.addImages(photos.photo)
+        photoList.addAll(photos.photo)
 
-
+        listMain.setPhotos(photoList)
         listMain.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -74,7 +70,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
-                val totalItemCount = linearLayoutManager.getItemCount();
+                val totalItemCount = linearLayoutManager.getItemCount()
                 val pastVisiblesItems = linearLayoutManager.findFirstVisibleItemPosition()
 
                 if (loading) {
@@ -82,6 +78,64 @@ class MainActivity : AppCompatActivity() {
                         loading = false
                         getImages(page)
                     }
+                }
+            }
+
+            /**
+             * todo 영상이 화면 바깥으로 나갔으나 바로 영상이 종료되지 않고 2~3초 뒤에 종료됨
+             */
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                var videoOnTemp = false
+
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+
+                    val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
+
+                    var targetPosition = 0
+                    var startPosition: Int = linearLayoutManager.findFirstVisibleItemPosition()
+                    var endPosition : Int = linearLayoutManager.findLastVisibleItemPosition()
+
+                    if (startPosition <= endPosition) {
+//                        var startPositionVideoHeight : Int = listMain.getVisibleVideoSurfaceHeight(startPosition)
+//                        var endPositionVideoHeight : Int = listMain.getVisibleVideoSurfaceHeight(endPosition)
+
+                        loop@ for (i in startPosition..endPosition) {
+                            Log.d(TAG, "* * * isVideo  : ${i} // ${photoList[i].isVideo}")
+                            if (photoList[i].isVideo) {
+                                targetPosition = i // 영상이 있으면 위치 번호를 매겨줌
+                                videoOnTemp = true
+                                break@loop
+                            } else {
+                                targetPosition = -1
+                            }
+                        }
+                    } else {
+                        targetPosition = -1
+                    }
+
+                    // onScrolled 내부의 로딩 분기처리는 아래와 합치는 것이 좋다.
+                    // listAdapter를 비슷한 타이밍에 두번 호출하는 경우를 막을 필요가 있다.
+                    if (loading) {
+                        for (i in 0..photoList.size-1) {
+                            photoList[i].videoOn = false
+                            if (photoList[i].isVideo) {
+                                if (i == targetPosition) {
+                                    photoList[i].videoOn = true
+                                    Log.d(TAG, "* * * videoOn true : ${i}")
+                                }
+                            }
+                        }
+                        Log.d(TAG, "* * * videoOn     : ${videoOn}")
+                        Log.d(TAG, "* * * videoOnTemp : ${videoOnTemp}")
+                        if (videoOn == videoOnTemp) {
+                            return
+                        } else {
+                            videoOn = videoOnTemp
+                            listAdapter.refreshImages(photoList)
+                        }
+                    }
+
                 }
             }
         })
