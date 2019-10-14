@@ -1,9 +1,6 @@
 package com.sampleapp.imagelist
 
-import android.content.ComponentName
 import android.net.Uri
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +8,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayerFactory
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory
-import com.google.android.exoplayer2.source.ExtractorMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView
+import com.google.android.exoplayer2.source.MediaSource
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory
 import com.google.android.exoplayer2.util.Util
 import com.meme.hwapp.response.Photo
 import kotlinx.android.synthetic.main.item_main_list.view.*
+
 
 class MainListItemHolder(parent: ViewGroup) :
     RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_main_list, parent, false)) {
@@ -27,54 +25,54 @@ class MainListItemHolder(parent: ViewGroup) :
     val title = itemView.textMainItem
     val video = itemView.vedioMainItem
 
-    private var exoplayerView : SimpleExoPlayerView? = null
+    private var playWhenReady = true
     private var exoplayer : SimpleExoPlayer? = null
-    private var playbackStateBuilder : PlaybackStateCompat.Builder? = null
-    private var mediaSession: MediaSessionCompat? = null
 
     fun bind(itemPhoto: Photo) {
-        initPlayer()
+        initializePlayer()
 
         val imageString = "https://farm${itemPhoto.farm}.staticflickr.com/${itemPhoto.server}/${itemPhoto.id}_${itemPhoto.secret}.jpg"
 
-        if (imageString != null) {
-            if (!imageString.isEmpty()) {
-                if (itemPhoto.isVideo) {
-                    // todo : 비디오 재생 구간
-                    photo.visibility = View.GONE
-                    video.visibility = View.VISIBLE
-                } else {
-                    Glide.with(itemView).load(imageString).into(photo)
-                    title.text = itemPhoto.title
-                    photo.visibility = View.VISIBLE
-                    video.visibility = View.GONE
-                }
-            } else {
+        if (!imageString.isEmpty()) {
+            if (itemPhoto.isVideo) {
+                title.text = "Test your streaming URL"
                 photo.visibility = View.GONE
+                video.visibility = View.VISIBLE
+            } else {
+                Glide.with(itemView).load(imageString).into(photo)
+                title.text = itemPhoto.title
+                photo.visibility = View.VISIBLE
+                video.visibility = View.GONE
             }
+        } else {
+            photo.visibility = View.GONE
         }
     }
 
-    fun initPlayer() {
-        val trackSelector = DefaultTrackSelector()
-        exoplayer = ExoPlayerFactory.newSimpleInstance(itemView.context, trackSelector)
-        exoplayerView?.player = exoplayer
+    private fun initializePlayer() {
+        val sample = "https://www.radiantmediaplayer.com/media/bbb-360p.mp4"
 
-        val userAgent = Util.getUserAgent(itemView.context, "Exo")
-        val mediaUri = Uri.parse("asset:///heart_attack.mp3")
-        val mediaSource = ExtractorMediaSource(mediaUri, DefaultDataSourceFactory(itemView.context, userAgent), DefaultExtractorsFactory(), null, null)
+        if (exoplayer == null) {
+            exoplayer = ExoPlayerFactory.newSimpleInstance(itemView.context)
+            //플레이어 연결
+            video?.setPlayer(exoplayer)
+        }
 
-        exoplayer?.prepare(mediaSource)
+        val mediaSource = buildMediaSource(Uri.parse(sample))
+        //prepare
+        exoplayer?.prepare(mediaSource, true, false)
+        //start,stop
+        exoplayer?.setPlayWhenReady(playWhenReady)
+    }
 
-        val componentName = ComponentName(itemView.context, "Exo")
-        mediaSession = MediaSessionCompat(itemView.context, "ExoPlayer", componentName, null)
-
-        playbackStateBuilder = PlaybackStateCompat.Builder()
-
-        playbackStateBuilder?.setActions(PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_PAUSE or
-                PlaybackStateCompat.ACTION_FAST_FORWARD)
-
-        mediaSession?.setPlaybackState(playbackStateBuilder?.build())
-        mediaSession?.isActive = true
+    // 네트워크에 있는 미디어 파일을 포맷별 Play가 가능하도록 객체 생성
+    private fun buildMediaSource(uri: Uri): MediaSource {
+        val userAgent = Util.getUserAgent(itemView.context, itemView.context.getString(R.string.app_name))
+        return if (uri.lastPathSegment!!.contains("mp3") || uri.lastPathSegment!!.contains("mp4")) {
+            ProgressiveMediaSource.Factory(DefaultHttpDataSourceFactory(userAgent)).createMediaSource(uri)
+//            HlsMediaSource.Factory(DefaultHttpDataSourceFactory(userAgent)).createMediaSource(uri)
+        } else {
+            ProgressiveMediaSource.Factory(DefaultDataSourceFactory(itemView.context, userAgent)).createMediaSource(uri)
+        }
     }
 }

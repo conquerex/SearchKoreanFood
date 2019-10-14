@@ -50,6 +50,9 @@ dependencies {
 
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.10.5'
+    implementation "com.google.android.exoplayer:extension-okhttp:2.7.2"
+    implementation "im.ene.toro3:toro:3.6.2.2804"
+    implementation "im.ene.toro3:toro-ext-exoplayer:3.6.2.2804"
     implementation 'com.github.bumptech.glide:glide:4.8.0'
     implementation 'com.github.bumptech.glide:glide:4.10.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.10.0'

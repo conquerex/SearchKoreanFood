@@ -22,14 +22,13 @@ class MainListAdapter : RecyclerView.Adapter<MainListItemHolder>() {
     }
 
     fun addImages(imgs: ArrayList<Photo>) {
-        Log.d("MainListAdapter", "* * * size : ${imgs.size}")
-        var i = 0
-        for (img in imgs) {
+        for (i in 1..imgs.size) {
             // 동영상 들어갈 Item, 임의로 정의
-            if (i % 6 == 0) {
-                img.isVideo = true
+            if (i == 4) {
+                Log.d("MainListAdapter", "* * * isVideo = true")
+                imgs[i-1].isVideo = true
             }
-            images.add(img)
+            images.add(imgs[i-1])
         }
         notifyItemRangeChanged(images.size - imgs.size, imgs.size)
     }
