@@ -24,3 +24,6 @@
 * 영상이 화면 바깥으로 나갔으나 영상은 몇초 후 종료가 됨
 * * 멈추는 방식이 잘못되었거나
 * * 화면 이탈을 제대로 인지하지 못하는 상황
+
+## 시연 영상 (나는 되는데요 방지)
+[https://github.com/conquerex/SearchKoreanFood/blob/master/video_searchKoreanFood.mp4](https://github.com/conquerex/SearchKoreanFood/blob/master/video_searchKoreanFood.mp4)
