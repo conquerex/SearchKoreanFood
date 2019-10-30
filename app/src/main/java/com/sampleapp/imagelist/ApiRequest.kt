@@ -11,7 +11,7 @@ interface ApiRequest {
     fun getImages(
         @Query("page") page: Int,
         @Query("method") query: String = "flickr.photos.search",
-        @Query("api_key") apiKey: String = "281583d4a69a4fd53e101a375b3d1636",
+        @Query("api_key") apiKey: String = "your_api_key",
         @Query("text") text: String = "'Korean Food'",
         @Query("per_page") perPage: String = "10",
         @Query("format") format: String = "json",
