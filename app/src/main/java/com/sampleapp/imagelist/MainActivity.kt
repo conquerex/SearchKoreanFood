@@ -16,7 +16,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class MainActivity : AppCompatActivity() {
-    private val TAG = "MainActivity"
+    private val TAG = javaClass.simpleName
     var apiRequest = NetworkSetting.getClient().create(ApiRequest::class.java)
     var page = 1
     var loading = true
@@ -40,7 +40,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun getImages(page: Int) {
-        apiRequest.getImages(page).enqueue(object : Callback<ImagesResponse> {
+        val key = resources.getString(R.string.flickr_key)
+        apiRequest.getImages(page, key).enqueue(object : Callback<ImagesResponse> {
             override fun onFailure(call: Call<ImagesResponse>, t: Throwable) {
                 Log.d(TAG, "* * * onFailure")
                 Log.d(TAG, "* * * ${t.message}")
@@ -48,9 +49,13 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call<ImagesResponse>, response: Response<ImagesResponse>) {
                 response.body()?.let {
-                    setAdapter(it.photos)
-                    this@MainActivity.page = page + 1
-                    loading = true
+                    Log.d(TAG, "* * * body : ${it}")
+                    Log.d(TAG, "* * * body : ${R.string.flickr_key.toString()}")
+                    if (it.photos != null && it.stat != "fail") {
+                        setAdapter(it.photos)
+                        this@MainActivity.page = page + 1
+                        loading = true
+                    }
                 }
             }
         })

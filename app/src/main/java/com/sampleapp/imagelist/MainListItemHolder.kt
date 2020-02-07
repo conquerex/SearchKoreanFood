@@ -4,9 +4,6 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.ProgressBar
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.android.exoplayer2.ExoPlayerFactory
@@ -21,18 +18,26 @@ import kotlinx.android.synthetic.main.item_main_list.view.*
 
 
 class MainListItemHolder(parent: ViewGroup) :
-    RecyclerView.ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_main_list, parent, false)) {
+    RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.item_main_list,
+            parent,
+            false
+        )
+    ) {
 
     val photo = itemView.imageMainItem
     val title = itemView.textMainItem
     val video = itemView.vedioMainItem
 
-    private var exoplayer : SimpleExoPlayer? = null
+    private var exoplayer: SimpleExoPlayer? = null
 
     fun bind(itemPhoto: Photo) {
         initializePlayer(itemPhoto)
 
-        val imageString = "https://farm${itemPhoto.farm}.staticflickr.com/${itemPhoto.server}/${itemPhoto.id}_${itemPhoto.secret}.jpg"
+        val imageString = "https://farm${itemPhoto.farm}.staticflickr.com" +
+                "/${itemPhoto.server}" +
+                "/${itemPhoto.id}_${itemPhoto.secret}.jpg"
 
         if (!imageString.isEmpty()) {
             if (itemPhoto.isVideo) {
@@ -73,11 +78,14 @@ class MainListItemHolder(parent: ViewGroup) :
 
     // 네트워크에 있는 미디어 파일을 포맷별 Play가 가능하도록 객체 생성
     private fun buildMediaSource(uri: Uri): MediaSource {
-        val userAgent = Util.getUserAgent(itemView.context, itemView.context.getString(R.string.app_name))
+        val userAgent =
+            Util.getUserAgent(itemView.context, itemView.context.getString(R.string.app_name))
         return if (uri.lastPathSegment!!.contains("mp3") || uri.lastPathSegment!!.contains("mp4")) {
-            ProgressiveMediaSource.Factory(DefaultHttpDataSourceFactory(userAgent)).createMediaSource(uri)
+            ProgressiveMediaSource.Factory(DefaultHttpDataSourceFactory(userAgent))
+                .createMediaSource(uri)
         } else {
-            ProgressiveMediaSource.Factory(DefaultDataSourceFactory(itemView.context, userAgent)).createMediaSource(uri)
+            ProgressiveMediaSource.Factory(DefaultDataSourceFactory(itemView.context, userAgent))
+                .createMediaSource(uri)
         }
     }
 }
